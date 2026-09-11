@@ -1,0 +1,37 @@
+# Bonilla Tree Service LLC
+
+> Licensed and insured tree service crew based in Jackson, Mississippi, working on homes and businesses across the Jackson metro. Owner-operated: the crew and the equipment are their own. Open 24 hours a day, 7 days a week. Free estimates. English and Spanish.
+
+## Key facts
+
+- Business name: Bonilla Tree Service LLC
+- Owner-operated (the crew and the equipment are the business's own)
+- Founded: 2022
+- Phone (call or text): 601-466-9145
+- Email: bonillatreeservicesllc@gmail.com
+- Website: https://bonillatreeservicellc.com/
+- Base: Jackson, Mississippi (service-area business, no public storefront)
+- Service area: Jackson, Ridgeland, Madison, Brandon, Pearl, Clinton, Flowood, Byram, Canton, Richland, Terry and Florence, MS
+- Storm and disaster response: anywhere in the United States after a major storm
+- Hours: open 24 hours, 7 days a week, including emergencies
+- Licensed and insured, residential and commercial
+- Languages: English, Spanish (se habla español)
+- Estimates: free, firm price before any work starts
+- Services (9): tree removal, tree trimming, pruning, stump grinding, lot clearing, land grading, tree planting, flower beds, fences
+- Crew climbs trees (no bucket truck needed for tight backyards); wood, branches and stumps are hauled away
+
+## Pages
+
+- [Home](https://bonillatreeservicellc.com/): services, service area, hours, FAQ, free estimate form
+- [Why trees in Jackson fall over whole](https://bonillatreeservicellc.com/why-trees-fall-in-jackson/): Yazoo clay, local tree species and storm patterns in the Jackson metro
+- [Tree service in Ridgeland, MS](https://bonillatreeservicellc.com/tree-service-ridgeland-ms/)
+- [Tree service in Madison, MS](https://bonillatreeservicellc.com/tree-service-madison-ms/)
+- [Tree service in Brandon, MS](https://bonillatreeservicellc.com/tree-service-brandon-ms/)
+- [Tree service in Pearl, MS](https://bonillatreeservicellc.com/tree-service-pearl-ms/)
+- [Tree service in Clinton, MS](https://bonillatreeservicellc.com/tree-service-clinton-ms/)
+- [Tree service in Flowood, MS](https://bonillatreeservicellc.com/tree-service-flowood-ms/)
+
+## Optional
+
+- Spanish version of any page: append `?lang=es` to the URL
+- Sitemap: https://bonillatreeservicellc.com/sitemap.xml

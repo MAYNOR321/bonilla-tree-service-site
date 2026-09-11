@@ -1,0 +1,2161 @@
+/* ============================================================================
+   BONILLA TREE SERVICE — stylesheet
+   Layout: the original "field notebook" build (signature rigging rope,
+   fullscreen parallax hero, slab service cards, masonry gallery).
+   Skin: the "Árbol vivo" palette from Claude Design turn 03 — light ground,
+   leaf green as the working color, pine anchoring blocks, bark only as ink,
+   hivis strictly for CTAs/focus/active.
+   Sections:
+     1. Tokens   2. Base   3. Rope   4. Header   5. Hero   6. Sections
+     7. Slabs    8. Steps  9. Masonry  10. Why cards  11. Estimate
+     12. Footer  13. FAB + mobile bar  14. Lightbox  15. Reveals
+     16. Reduced motion  17. Desktop layout
+   ========================================================================== */
+
+/* ---------- 1. TOKENS ------------------------------------------------------ */
+:root {
+  --pine: #0e3a1c;
+  --leaf: #3f9e52;
+  --sprout: #8fd49b;
+  --sage: #eef4e9;
+  --paper: #f7faf4;
+  --hivis: #d6ff3d;
+  --bark: #241c14;
+  --line: #cfdcc8;
+  --ink-soft: #54604f;
+  /* ink-muted and leaf-ink are darkened text-only variants that clear
+     WCAG AA (4.5:1) for small type on paper/sage — leaf itself only passes
+     as a large-text or decorative color. */
+  --ink-muted: #59665a;
+  --leaf-ink: #2e7a3c;
+
+  --font-display: "Big Shoulders Display", "Arial Narrow", sans-serif;
+  --font-body: "Inter Tight", system-ui, sans-serif;
+  --font-mono: "Space Mono", ui-monospace, monospace;
+
+  --size-hero: clamp(3.25rem, 11vw, 8.5rem);
+  --size-h2: clamp(2.5rem, 6.5vw, 4.75rem);
+  --size-body: clamp(1.0625rem, 1.1vw + 0.8rem, 1.125rem);
+  --size-label: 0.6875rem;
+
+  --space-section: clamp(4rem, 9vw, 8rem);
+  --space-gutter: clamp(1.25rem, 4vw, 3rem);
+  --rope-gutter: clamp(2.5rem, 6vw, 4.5rem);
+
+  --ease-reveal: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-ui: 0.3s;
+  --dur-reveal: 0.7s;
+}
+
+/* ---------- 2. BASE -------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--pine);
+  font-family: var(--font-body);
+  font-size: var(--size-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 0.88;
+  letter-spacing: -0.01em;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--size-label);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+:focus-visible {
+  outline: 3px solid var(--hivis);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -100vw;
+  top: 0;
+  background: var(--hivis);
+  color: var(--bark);
+  padding: 0.75rem 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+/* ---------- 3. SIGNATURE ROPE ---------------------------------------------- */
+/* Scroll-driven: the rope draws and the carabiner slides with scroll(root).
+   Position is transform-only (never top/left). Hidden under 1100px. */
+.rope-rail {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: calc(var(--rope-gutter) / 2);
+  width: 2.5rem;
+  height: 100vh;
+  z-index: 30;
+  pointer-events: none;
+}
+
+@media (min-width: 1100px) {
+  .rope-rail {
+    display: block;
+  }
+}
+
+.rope-rail svg {
+  width: 100%;
+  height: 100%;
+}
+
+.rope-path {
+  fill: none;
+  stroke: var(--leaf);
+  stroke-width: 2.5;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw-rope linear;
+  animation-timeline: scroll(root);
+}
+
+.rope-rail.is-slack .rope-path {
+  stroke: color-mix(in srgb, var(--sprout) 75%, transparent);
+}
+
+@keyframes draw-rope {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.carabiner {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  transform: translate(-50%, -50%);
+  animation: slide-carabiner linear;
+  animation-timeline: scroll(root);
+}
+
+@keyframes slide-carabiner {
+  from {
+    transform: translate(-50%, -50%);
+  }
+  to {
+    transform: translate(-50%, calc(100vh - 50% - 1.5rem));
+  }
+}
+
+.carabiner svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 2px 3px rgba(14, 58, 28, 0.3));
+}
+
+@supports not (animation-timeline: scroll()) {
+  .rope-path {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+
+  .carabiner {
+    animation: none;
+    top: 50%;
+  }
+}
+
+/* ---------- 4. HEADER ------------------------------------------------------ */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem var(--space-gutter);
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid #dbe4d4;
+  transition: box-shadow var(--dur-ui) ease;
+}
+
+.site-header.is-scrolled {
+  box-shadow: 0 4px 18px rgba(14, 58, 28, 0.08);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+}
+
+.brand-mark {
+  width: 2.1rem;
+  height: auto;
+  aspect-ratio: 351 / 499;
+  flex-shrink: 0;
+}
+
+.brand-word {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.1rem;
+  line-height: 0.95;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--pine);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.brand-word small {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 0.55rem;
+  letter-spacing: 0.18em;
+  color: var(--ink-muted);
+}
+
+/* Keep the wordmark on one line so "LLC" never strands on its own row. */
+.brand-name {
+  white-space: nowrap;
+}
+
+/* LLC rides small alongside the wordmark, the way it sits in the real
+   logo — kept on the same line so it never strands on its own row. */
+.brand-llc {
+  font-size: 0.6em;
+  margin-left: 0.3em;
+  vertical-align: 0.12em;
+  letter-spacing: 0.06em;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.lang-toggle {
+  display: flex;
+  border: 1px solid var(--line);
+}
+
+.lang-toggle button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  padding: 0.5rem 0.7rem;
+  cursor: pointer;
+  transition: background var(--dur-ui), color var(--dur-ui);
+}
+
+.lang-toggle button[aria-pressed="true"] {
+  background: var(--pine);
+  color: var(--paper);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.9rem 1.4rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background var(--dur-ui), color var(--dur-ui), border-color var(--dur-ui), transform var(--dur-ui) var(--ease-reveal);
+}
+
+.btn--hivis {
+  background: var(--hivis);
+  color: var(--bark);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.2rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.btn--hivis:hover {
+  background: var(--pine);
+  color: var(--hivis);
+}
+
+.btn--outline {
+  border-color: var(--pine);
+  color: var(--pine);
+  background: transparent;
+}
+
+.btn--outline:hover {
+  background: var(--pine);
+  color: var(--paper);
+}
+
+/* ghost: for use on top of the hero photo */
+.btn--ghost {
+  border-color: rgba(247, 250, 244, 0.65);
+  color: var(--paper);
+  background: transparent;
+}
+
+.btn--ghost:hover {
+  background: var(--paper);
+  color: var(--pine);
+  border-color: var(--paper);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+.nav-call {
+  background: var(--hivis);
+  border-color: var(--hivis);
+  color: var(--bark);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.6rem 0.9rem;
+  white-space: nowrap;
+}
+
+/* On phones the sticky bottom bar already carries Call/Text, so the header
+   call button is redundant — hide it instead of letting it wrap or overflow. */
+@media (max-width: 560px) {
+  .nav-call {
+    display: none;
+  }
+
+  .brand-word {
+    font-size: 0.95rem;
+  }
+}
+
+.nav-call:hover {
+  background: var(--pine);
+  border-color: var(--pine);
+  color: var(--hivis);
+}
+
+/* ---------- 5. HERO -------------------------------------------------------- */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  color: var(--paper);
+}
+
+.hero-planes {
+  position: absolute;
+  inset: -4%;
+}
+
+.hero-plane {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.hero-plane--sky {
+  background: linear-gradient(180deg, var(--sage), var(--paper));
+}
+
+.hero-plane--main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(14, 58, 28, 0.1) 0%, rgba(14, 58, 28, 0.05) 45%, rgba(14, 58, 28, 0.82) 100%),
+    linear-gradient(90deg, rgba(14, 58, 28, 0.45) 0%, transparent 55%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 0 var(--space-gutter) clamp(4.5rem, 10vh, 7rem);
+  max-width: 60rem;
+}
+
+.hero-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--hivis);
+  margin-bottom: 1.1rem;
+}
+
+.hero-eyebrow::before {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  background: var(--hivis);
+}
+
+.hero h1 {
+  font-size: var(--size-hero);
+  line-height: 0.85;
+}
+
+.reveal-line {
+  display: block;
+  overflow: hidden;
+}
+
+.reveal-line > span {
+  display: inline-block;
+  translate: 0 110%;
+  animation: rise-in var(--dur-reveal) var(--ease-reveal) forwards;
+}
+
+.reveal-line:nth-child(2) > span {
+  animation-delay: 0.12s;
+}
+
+@keyframes rise-in {
+  to {
+    translate: 0 0;
+  }
+}
+
+.hero-sub {
+  margin-top: 1.25rem;
+  max-width: 34rem;
+  color: rgba(247, 250, 244, 0.9);
+}
+
+.hero-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+
+.trust-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trust-row li {
+  background: rgba(247, 250, 244, 0.14);
+  border: 1px solid rgba(247, 250, 244, 0.3);
+  backdrop-filter: blur(4px);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.trust-row li:not(:has(a)) {
+  padding: 0.5rem 0.7rem;
+}
+
+/* The storm chip is a jump link to the emergency section — give it the
+   whole chip as a target and a visible hover/focus state. */
+.trust-row a {
+  display: block;
+  padding: 0.5rem 0.7rem;
+  text-decoration: none;
+  transition: background var(--dur-ui), color var(--dur-ui);
+}
+
+.trust-row a:hover,
+.trust-row a:focus-visible {
+  background: var(--hivis);
+  color: var(--bark);
+}
+
+.scroll-cue {
+  position: absolute;
+  right: var(--space-gutter);
+  bottom: 1.4rem;
+  z-index: 2;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(247, 250, 244, 0.75);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.scroll-cue::after {
+  content: "";
+  width: 1px;
+  height: 2.25rem;
+  background: linear-gradient(180deg, var(--hivis), transparent);
+  animation: cue-drip 2.2s ease-in-out infinite;
+}
+
+@keyframes cue-drip {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scaleY(0.6);
+    transform-origin: top;
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+/* ---------- 6. SECTIONS ---------------------------------------------------- */
+.section {
+  padding: var(--space-section) var(--space-gutter);
+}
+
+.section--sage {
+  background: var(--sage);
+}
+
+.section-inner {
+  max-width: 72rem;
+  margin-inline: auto;
+}
+
+@media (min-width: 1100px) {
+  .section-inner {
+    padding-left: var(--rope-gutter);
+  }
+}
+
+.section-head {
+  max-width: 46rem;
+  margin-bottom: clamp(2rem, 6vw, 4rem);
+}
+
+/* Eyebrows label a whole section, so they sit a step above the 11px
+   utility --size-label used for chips and captions. */
+.eyebrow {
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+}
+
+.section-head .eyebrow {
+  color: var(--leaf-ink);
+  margin-bottom: 0.7rem;
+}
+
+.section-head h2 {
+  color: var(--pine);
+}
+
+.section-head > p {
+  margin-top: 0.9rem;
+  color: var(--ink-soft);
+}
+
+/* cut-line divider: a dashed "cut here" line that draws in on reveal */
+.cut-line {
+  height: 1px;
+  margin-bottom: clamp(2rem, 5vw, 3.5rem);
+  background: repeating-linear-gradient(90deg, var(--leaf) 0 10px, transparent 10px 18px);
+  transform-origin: left;
+  scale: 0 1;
+  transition: scale 0.9s var(--ease-reveal);
+}
+
+.cut-line.is-visible {
+  scale: 1 1;
+}
+
+/* ---------- STORM & EMERGENCY --------------------------------------------- */
+/* Bark is the page's ink color, used as a surface only here and on the storm
+   service card — that break in the paper/sage rhythm is what makes this
+   section read as urgent without shouting. */
+.storm {
+  background: var(--bark);
+  color: var(--paper);
+}
+
+.storm-grid {
+  display: grid;
+  gap: clamp(1.75rem, 4vw, 3rem);
+  grid-template-columns: 1fr;
+  align-items: center;
+}
+
+@media (min-width: 860px) {
+  .storm-grid {
+    grid-template-columns: 1.1fr 0.9fr;
+  }
+}
+
+.storm-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--hivis);
+  margin-bottom: 0.9rem;
+}
+
+/* Steady dot, not a blinking alarm — urgency without a distracting loop. */
+.storm-eyebrow::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--hivis);
+  flex-shrink: 0;
+}
+
+.storm-title {
+  font-size: clamp(2.25rem, 5.5vw, 3.75rem);
+  color: var(--paper);
+}
+
+.storm-sub {
+  margin-top: 1.1rem;
+  max-width: 42ch;
+  color: #d8e6d6;
+}
+
+.storm-list-label {
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+  color: var(--sprout);
+}
+
+.storm-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+  max-width: 46ch;
+}
+
+.storm-list li {
+  position: relative;
+  padding-left: 1.6rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--paper);
+}
+
+.storm-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 0.6rem;
+  height: 2px;
+  background: var(--hivis);
+}
+
+.storm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+
+/* Nationwide disaster travel: full-width block under the two-column grid.
+   It answers the three questions a reader actually has — what kind of event,
+   what the crew brings, what they do on site — instead of just claiming
+   national coverage. */
+.disaster {
+  margin-top: clamp(2.5rem, 6vw, 4rem);
+  padding-top: clamp(2rem, 5vw, 3rem);
+  border-top: 1px solid rgba(247, 250, 244, 0.22);
+}
+
+.disaster-eyebrow {
+  color: var(--hivis);
+  margin-bottom: 0.75rem;
+}
+
+.disaster-title {
+  font-size: clamp(1.75rem, 3.6vw, 2.5rem);
+  color: var(--paper);
+  max-width: 20ch;
+}
+
+.disaster-lede {
+  margin-top: 1rem;
+  max-width: 62ch;
+  color: #d8e6d6;
+}
+
+.disaster-points {
+  display: grid;
+  gap: clamp(1.25rem, 3vw, 2rem);
+  grid-template-columns: 1fr;
+  margin-top: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+@media (min-width: 760px) {
+  .disaster-points {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.disaster-point {
+  border-left: 2px solid var(--leaf);
+  padding-left: 1rem;
+}
+
+.disaster-point .label {
+  display: block;
+  color: var(--sprout);
+  margin-bottom: 0.5rem;
+}
+
+.disaster-point p:last-child {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--paper);
+}
+
+.disaster-note {
+  margin-top: clamp(1.75rem, 4vw, 2.5rem);
+  max-width: 72ch;
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--sprout);
+}
+
+.storm-photo {
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+}
+
+.storm-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Services eyebrow: reads as the label of a numbered list. The rule and the
+   trailing total echo the 01–09 markers on the cards below it. */
+.services-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+}
+
+.services-eyebrow::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  max-width: 8rem;
+  background: repeating-linear-gradient(90deg, var(--leaf) 0 8px, transparent 8px 14px);
+}
+
+.services-count {
+  order: 3;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--leaf-ink);
+}
+
+/* ---------- ABOUT US ------------------------------------------------------- */
+/* One dominant display headline; this kicker is a deliberately quiet mono
+   caption underneath it, not a competing subhead. */
+.about-kicker {
+  color: var(--ink-muted);
+  margin-top: 0.9rem;
+}
+
+.about-grid {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  grid-template-columns: 1fr;
+  align-items: center;
+  margin-bottom: clamp(2rem, 5vw, 3rem);
+}
+
+@media (min-width: 760px) {
+  .about-grid {
+    grid-template-columns: 1.15fr 0.85fr;
+  }
+}
+
+.about-copy p {
+  color: var(--ink-soft);
+  max-width: 54ch;
+}
+
+.about-copy p + p {
+  margin-top: 1.1rem;
+}
+
+.about-photo {
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+}
+
+.about-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Quiet qualitative marks under the cut-line — mono, no counters, no numbers */
+.about-marks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 2.5rem;
+  margin-top: clamp(1.25rem, 3vw, 2rem);
+}
+
+.about-marks span {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+/* ---------- 7. SERVICES — slabs -------------------------------------------- */
+.slab-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .slab-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1000px) {
+  .slab-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Nine cards: at the 2-column range the 9th would sit alone — let it span
+   the full row so nothing looks stranded. At 3 columns 9 divides evenly. */
+@media (min-width: 640px) and (max-width: 999px) {
+  .slab:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+.slab {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--line);
+  opacity: 0;
+  translate: 0 24px;
+  transition:
+    translate 0.6s var(--ease-reveal),
+    opacity 0.6s var(--ease-reveal),
+    border-color var(--dur-ui),
+    box-shadow var(--dur-ui);
+}
+
+.slab.is-visible {
+  opacity: 1;
+  translate: 0 0;
+}
+
+.slab:hover {
+  border-color: var(--leaf);
+  box-shadow: 0 0.9rem 1.8rem rgba(14, 58, 28, 0.12);
+}
+
+/* the "live edge": a leaf gradient strip along the top of each slab */
+.slab-edge {
+  height: 0.4rem;
+  background: linear-gradient(90deg, var(--leaf), var(--sprout));
+  transform-origin: left;
+  scale: 0 1;
+  transition: scale 0.7s var(--ease-reveal) 0.15s;
+}
+
+.slab.is-visible .slab-edge {
+  scale: 1 1;
+}
+
+.slab-face {
+  padding: 1.4rem 1.4rem 1.6rem;
+}
+
+.slab-num {
+  color: var(--leaf-ink);
+  margin-bottom: 0.9rem;
+}
+
+.slab-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.6rem, 4vw, 2rem);
+  line-height: 0.9;
+  text-transform: uppercase;
+  color: var(--pine);
+}
+
+.slab-copy {
+  margin-top: 0.7rem;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+/* ---------- 8. STEPS ------------------------------------------------------- */
+.steps {
+  display: grid;
+  gap: 2rem;
+  counter-reset: step;
+}
+
+@media (min-width: 760px) {
+  .steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.step-index {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(3rem, 8vw, 4.5rem);
+  line-height: 1;
+  color: var(--leaf);
+  letter-spacing: 0;
+}
+
+.step h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.4rem, 4vw, 1.7rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: var(--pine);
+  margin-top: 0.5rem;
+}
+
+.step p {
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  max-width: 26rem;
+}
+
+/* ---------- 9. GALLERY — masonry ------------------------------------------- */
+.masonry {
+  columns: 2;
+  column-gap: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+@media (min-width: 900px) {
+  .masonry {
+    columns: 3;
+  }
+}
+
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: clamp(0.75rem, 2vw, 1.25rem);
+  position: relative;
+  overflow: hidden;
+  cursor: zoom-in;
+  opacity: 0;
+  clip-path: inset(0 0 100% 0);
+  transition: opacity 0.6s var(--ease-reveal), clip-path 0.7s var(--ease-reveal);
+}
+
+.masonry-item.is-visible {
+  opacity: 1;
+  clip-path: inset(0 0 0 0);
+}
+
+.masonry-item button {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: zoom-in;
+  width: 100%;
+  display: block;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+
+.masonry-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.7s var(--ease-reveal);
+}
+
+.masonry-item:hover img {
+  transform: scale(1.04);
+}
+
+.masonry-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1.6rem 0.8rem 0.6rem;
+  background: linear-gradient(180deg, transparent, rgba(14, 58, 28, 0.85));
+  color: var(--paper);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0;
+  translate: 0 8px;
+  transition: opacity var(--dur-ui) ease, translate var(--dur-ui) ease;
+}
+
+.masonry-item:hover .masonry-caption,
+.masonry-item:focus-within .masonry-caption {
+  opacity: 1;
+  translate: 0 0;
+}
+
+@media (hover: none) {
+  .masonry-caption {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* ---------- 10. WHY BONILLA ------------------------------------------------ */
+/* Centered lede: reads as a statement, not filler — larger than body copy,
+   generous leading, capped at a comfortable measure. */
+/* This section carries no other headline, so "Why Bonilla" is a real section
+   title — sized between the eyebrows and the big display h2s so it leads the
+   lede without out-shouting the section titles further down the page. */
+.why-title {
+  text-align: center;
+  font-size: clamp(2.25rem, 5vw, 3.25rem);
+  color: var(--pine);
+  margin-bottom: 1.25rem;
+}
+
+.why-lede {
+  font-size: clamp(1.0625rem, 0.95rem + 0.55vw, 1.375rem);
+  line-height: 1.75;
+  max-width: 68ch;
+  margin: 0 auto clamp(2.25rem, 6vw, 3.5rem);
+  text-align: center;
+  color: var(--pine);
+}
+
+.why-cards {
+  display: grid;
+  gap: clamp(1rem, 3vw, 1.5rem);
+  grid-template-columns: 1fr;
+}
+
+/* Three cards: 1 column on phones, all three across on wider screens */
+@media (min-width: 760px) {
+  .why-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.why-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  overflow: hidden;
+  opacity: 0;
+  translate: 0 24px;
+  transition:
+    transform var(--dur-ui) var(--ease-reveal),
+    box-shadow var(--dur-ui) var(--ease-reveal),
+    border-color var(--dur-ui),
+    opacity 0.6s var(--ease-reveal),
+    translate 0.6s var(--ease-reveal);
+}
+
+.why-card.is-visible {
+  opacity: 1;
+  translate: 0 0;
+}
+
+.why-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--leaf);
+  box-shadow: 0 1rem 2rem rgba(14, 58, 28, 0.14);
+}
+
+.why-card-media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.why-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s var(--ease-reveal);
+}
+
+.why-card:hover .why-card-media img {
+  transform: scale(1.04);
+}
+
+.why-card-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(15deg, rgba(14, 58, 28, 0.5), transparent 45%);
+}
+
+.why-card-icon {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  z-index: 1;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: grid;
+  place-items: center;
+  background: var(--pine);
+  color: var(--hivis);
+  border-radius: 3px;
+}
+
+.why-card-icon svg {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+.why-card-body {
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+.why-card-body h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.4rem;
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: var(--pine);
+}
+
+.why-card-body p {
+  margin-top: 0.5rem;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+
+/* The linked cities in the footer's "Areas we serve" list. Underlined on hover
+   only, so the list still reads as a list rather than a wall of links. */
+.footer-areas-list a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(143, 212, 155, 0.45);
+  transition: border-color var(--dur-ui), color var(--dur-ui);
+}
+
+.footer-areas-list a:hover {
+  color: var(--sprout);
+  border-bottom-color: var(--sprout);
+}
+
+/* ---------- 10a. SERVICE-AREA PAGES ---------------------------------------- */
+/* Only used by the generated /tree-service-<city>-ms/ pages. They reuse the
+   homepage's header, footer, sections and buttons; this block is just the few
+   pieces those pages need that the homepage has no equivalent for. */
+.city-hero {
+  padding-top: clamp(6rem, 12vw, 9rem);
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: var(--size-label);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.breadcrumb a {
+  color: var(--leaf-ink);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--dur-ui);
+}
+
+.breadcrumb a:hover {
+  border-bottom-color: var(--leaf);
+}
+
+.city-hero h1 {
+  font-size: clamp(2.6rem, 7vw, 4.4rem);
+  line-height: 0.92;
+  text-transform: uppercase;
+  color: var(--pine);
+  margin-top: 0.6rem;
+  text-wrap: balance;
+}
+
+.city-lead {
+  margin-top: 1.4rem;
+  max-width: 44rem;
+  font-size: clamp(1.02rem, 2.4vw, 1.18rem);
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+.city-note {
+  max-width: 46rem;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+
+/* Hero: copy on the left, a real job photo on the right. Without the photo the
+   hero was mostly empty space above the fold and the page read as unfinished. */
+.city-hero-grid {
+  display: grid;
+  gap: 2.5rem;
+}
+
+@media (min-width: 900px) {
+  .city-hero-grid {
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: center;
+    gap: 3.5rem;
+  }
+}
+
+.city-figure {
+  margin: 0;
+}
+
+.city-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+}
+
+.city-figure--hero img {
+  max-height: 520px;
+  object-fit: cover;
+}
+
+/* On bark, small text needs the light ink or it drops under AA. */
+.storm .city-note {
+  color: var(--sage);
+}
+
+.city-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-top: 2rem;
+}
+
+.city-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  padding: 0;
+  list-style: none;
+}
+
+.city-chips li {
+  padding: 0.45rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink-muted);
+}
+
+.city-services {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 700px) {
+  .city-services {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.city-service {
+  padding: 1.5rem;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  transition: border-color var(--dur-ui), translate var(--dur-ui) var(--ease-reveal);
+}
+
+.city-service:hover {
+  border-color: var(--leaf);
+  translate: 0 -3px;
+}
+
+.city-service h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.25rem;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--pine);
+}
+
+.city-service p {
+  margin-top: 0.6rem;
+  font-size: 0.94rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.city-more {
+  margin-top: 2rem;
+}
+
+.city-more a {
+  font-family: var(--font-mono);
+  font-size: var(--size-label);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--leaf-ink);
+  border-bottom: 1px solid var(--leaf);
+  padding-bottom: 2px;
+  text-decoration: none;
+}
+
+.nearby {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.nearby h3 {
+  color: var(--ink-muted);
+  margin-bottom: 0.8rem;
+}
+
+.nearby p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.4rem;
+}
+
+.nearby a {
+  color: var(--leaf-ink);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--dur-ui);
+}
+
+.nearby a:hover {
+  border-bottom-color: var(--leaf);
+}
+
+/* ---------- 10a-ii. AT A GLANCE (homepage) --------------------------------- */
+/* A compact fact block under the "Why Bonilla" lede. It exists for machines
+   as much as people: AI answers are pulled from the first third of a page,
+   and they lift self-contained, factual statements — so the facts a customer
+   asks about most sit here, plainly labelled, above the fold of the section. */
+.glance {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+  gap: 0.9rem 1.5rem;
+  margin: 1.8rem 0 0;
+  padding: 1.4rem 0 0;
+  border-top: 1px solid var(--line);
+}
+
+.glance > div { display: grid; gap: 0.15rem; }
+
+.glance dt {
+  font-family: var(--font-mono);
+  font-size: var(--size-label);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.glance dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--pine);
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.glance-updated {
+  margin-top: 1rem;
+  font-family: var(--font-mono);
+  font-size: var(--size-label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+/* ---------- 10a-iii. ARTICLES ----------------------------------------------- */
+/* Long-form pages generated from data/articles.js. They borrow the city-page
+   hero pieces (breadcrumb, .city-figure) and add reading-measure typography. */
+.article-hero { padding-top: clamp(6rem, 12vw, 9rem); }
+
+.article-hero h1 {
+  font-size: clamp(2.2rem, 6vw, 3.6rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: var(--pine);
+  margin-top: 0.6rem;
+  max-width: 22ch;
+  text-wrap: balance;
+}
+
+.byline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.6rem;
+  margin: 1rem 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--size-label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.byline time { color: var(--leaf-ink); }
+
+.article-hero-grid {
+  display: grid;
+  gap: 2rem;
+  margin-top: 1.8rem;
+}
+
+@media (min-width: 900px) {
+  .article-hero-grid {
+    grid-template-columns: 1.25fr 0.75fr;
+    align-items: start;
+    gap: 3rem;
+  }
+}
+
+.article-lead {
+  font-size: clamp(1.05rem, 2.3vw, 1.2rem);
+  line-height: 1.6;
+  color: var(--ink);
+  max-width: 60ch;
+}
+
+.article-body .section-inner { max-width: 46rem; }
+
+.article-body h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.5rem, 3.6vw, 2rem);
+  line-height: 1.05;
+  text-transform: uppercase;
+  color: var(--pine);
+  margin: 2.6rem 0 0.8rem;
+  text-wrap: balance;
+}
+
+.article-body h2:first-child { margin-top: 0; }
+
+.article-body p,
+.article-body li {
+  font-size: 1.02rem;
+  line-height: 1.68;
+  color: var(--ink-soft);
+  max-width: 68ch;
+}
+
+.article-body p + p { margin-top: 1rem; }
+
+.article-body ul {
+  margin: 0.8rem 0 1rem;
+  padding-left: 1.2rem;
+}
+
+.article-body li { margin-bottom: 0.6rem; }
+
+.sources {
+  margin: 0.8rem 0 0;
+  padding-left: 1.3rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--ink-muted);
+}
+
+.sources li { margin-bottom: 0.5rem; }
+
+.sources a {
+  color: var(--leaf-ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--sprout);
+}
+
+.sources a:hover { border-bottom-color: var(--leaf); }
+
+/* A "read more" link inside an FAQ answer, styled like the city pages' .city-more. */
+.faq-link { margin-top: 0.7rem; }
+
+.faq-link a {
+  font-family: var(--font-mono);
+  font-size: var(--size-label);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--leaf-ink);
+  border-bottom: 1px solid var(--leaf);
+  padding-bottom: 2px;
+  text-decoration: none;
+}
+
+/* ---------- 10b. FAQ ------------------------------------------------------- */
+/* Native <details>, so it works with no JS and stays keyboard-operable. The
+   questions are full sentences, so they stay in the body font — the uppercase
+   display face used for headings would shout at this length. */
+.faq-list {
+  max-width: 52rem;
+  border-top: 1px solid var(--line);
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--line);
+}
+
+.faq-item summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.15rem 0;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+  font-size: clamp(1rem, 2.2vw, 1.08rem);
+  line-height: 1.35;
+  color: var(--pine);
+  transition: color var(--dur-ui);
+}
+
+/* Safari still paints its own disclosure triangle without this. */
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item summary:hover {
+  color: var(--leaf-ink);
+}
+
+.faq-item summary:focus-visible {
+  outline: 2px solid var(--leaf);
+  outline-offset: 3px;
+}
+
+/* A "+" rotated 45° into an "×" — one glyph, so the state change animates
+   instead of snapping the way a content swap would. */
+.faq-item summary::after {
+  content: "+";
+  flex: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--leaf);
+  transition: rotate var(--dur-ui) var(--ease-reveal);
+}
+
+.faq-item[open] summary::after {
+  rotate: 45deg;
+}
+
+.faq-item p {
+  padding: 0 0 1.35rem;
+  max-width: 44rem;
+  font-size: 0.97rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+/* ---------- 11. ESTIMATE --------------------------------------------------- */
+.estimate {
+  background: var(--leaf);
+}
+
+/* On the leaf background, small text needs bark ink to clear AA (≈5:1);
+   the huge display h2 passes as large text in paper. */
+.estimate .section-head .eyebrow {
+  color: var(--bark);
+}
+
+.estimate .section-head h2 {
+  color: var(--paper);
+}
+
+.estimate .section-head > p {
+  color: var(--bark);
+}
+
+.estimate-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 900px) {
+  .estimate-grid {
+    grid-template-columns: 1.4fr 1fr;
+    align-items: start;
+  }
+}
+
+.estimate-form {
+  background: var(--paper);
+  padding: clamp(1.25rem, 3.5vw, 2rem);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 1rem;
+}
+
+.field label,
+.field .label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.field input,
+.field textarea {
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  padding: 0.65rem 0.1rem;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--pine);
+  transition: border-color var(--dur-ui);
+}
+
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  border-bottom-color: var(--leaf);
+}
+
+.field-row {
+  display: grid;
+  gap: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .field-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.field-error {
+  color: #9c2f2f;
+  font-size: 0.75rem;
+  min-height: 1em;
+}
+
+.field.has-error input {
+  border-bottom-color: #9c2f2f;
+}
+
+.chip-group,
+.radio-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.chip {
+  position: relative;
+}
+
+.chip input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+}
+
+.chip label {
+  display: inline-block;
+  border: 1px solid var(--line);
+  padding: 0.5rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background var(--dur-ui), color var(--dur-ui), border-color var(--dur-ui);
+}
+
+.chip input:checked + label {
+  background: var(--pine);
+  border-color: var(--pine);
+  color: var(--paper);
+}
+
+.chip input:focus-visible + label {
+  outline: 3px solid var(--hivis);
+  outline-offset: 2px;
+}
+
+.estimate-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+}
+
+.form-status {
+  margin-top: 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  min-height: 1.4em;
+}
+
+.form-status--ok {
+  color: var(--pine);
+}
+
+.form-status--error {
+  color: #9c2f2f;
+}
+
+.btn.is-loading {
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.estimate-note {
+  margin-top: 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.confirm-state {
+  display: none;
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  padding-top: 1.25rem;
+}
+
+.confirm-state.is-visible {
+  display: block;
+}
+
+.confirm-state h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 1.4rem;
+  color: var(--pine);
+}
+
+.confirm-state p {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  margin-top: 0.4rem;
+}
+
+.confirm-state .confirm-message {
+  color: var(--pine) !important;
+}
+
+.confirm-copy-btn {
+  margin-top: 0.9rem;
+}
+
+.estimate-aside {
+  background: var(--pine);
+  padding: clamp(1.25rem, 3.5vw, 2rem);
+  color: var(--paper);
+}
+
+.estimate-aside .eyebrow {
+  color: var(--sprout);
+  margin-bottom: 1rem;
+}
+
+.estimate-aside dl {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.estimate-aside dt {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sprout);
+}
+
+.estimate-aside dd {
+  margin: 0.25rem 0 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.estimate-aside dd a {
+  color: var(--hivis);
+  text-decoration: none;
+}
+
+.estimate-aside dd a:hover {
+  color: var(--paper);
+}
+
+.estimate-aside .dd-small,
+.estimate-aside .dd-small a {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.85rem;
+  text-transform: none;
+  line-height: 1.4;
+  color: var(--paper);
+}
+
+/* ---------- 12. FOOTER ----------------------------------------------------- */
+.site-footer {
+  background: var(--pine);
+  color: var(--paper);
+  padding: clamp(2.75rem, 7vw, 4rem) var(--space-gutter) 5.5rem;
+}
+
+.footer-grid {
+  max-width: 72rem;
+  margin-inline: auto;
+  display: grid;
+  gap: 2rem;
+}
+
+@media (min-width: 760px) {
+  .footer-grid {
+    grid-template-columns: 1.4fr 1fr 1fr;
+  }
+}
+
+.footer-brand .brand-word {
+  color: var(--paper);
+}
+
+.footer-brand > p {
+  margin-top: 0.9rem;
+  font-size: 0.92rem;
+  color: #b9cbb8;
+  max-width: 22rem;
+}
+
+.footer-col h4 {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sprout);
+  margin-bottom: 0.9rem;
+}
+
+.footer-col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.92rem;
+  color: #d8e6d6;
+}
+
+.footer-col a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.footer-col a:hover {
+  color: var(--hivis);
+}
+
+.footer-storm {
+  color: var(--sprout);
+}
+
+.footer-areas {
+  max-width: 72rem;
+  margin: 2rem auto 0;
+  padding-top: 1.1rem;
+  border-top: 1px solid rgba(247, 250, 244, 0.18);
+}
+
+.footer-areas h4 {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sprout);
+  margin: 0 0 0.5rem;
+}
+
+.footer-areas p {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  line-height: 1.9;
+  color: #a8c3ab;
+}
+
+.footer-bottom {
+  max-width: 72rem;
+  margin: 1.4rem auto 0;
+  padding-top: 1.1rem;
+  border-top: 1px solid rgba(247, 250, 244, 0.18);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7fa385;
+}
+
+/* ---------- 13. MOBILE BAR ------------------------------------------------- */
+.mobile-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid rgba(14, 58, 28, 0.2);
+}
+
+@media (min-width: 760px) {
+  .mobile-bar {
+    display: none;
+  }
+}
+
+.mobile-bar a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.mobile-bar a:first-child {
+  background: var(--pine);
+  color: var(--paper);
+}
+
+.mobile-bar a:last-child {
+  background: var(--hivis);
+  color: var(--bark);
+}
+
+/* ---------- 14. LIGHTBOX --------------------------------------------------- */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(14, 58, 28, 0.94);
+  padding: 3.5rem 1rem;
+}
+
+.lightbox[open] {
+  display: flex;
+}
+
+.lightbox-figure {
+  margin: 0;
+  max-width: min(92vw, 64rem);
+  max-height: 80vh;
+  view-transition-name: lightbox-photo;
+}
+
+.lightbox-figure img {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+}
+
+.lightbox-caption {
+  position: absolute;
+  left: 50%;
+  bottom: 1.25rem;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: var(--sprout);
+  text-transform: uppercase;
+  text-align: center;
+  max-width: 90vw;
+}
+
+.lightbox-close,
+.lightbox-nav {
+  position: absolute;
+  appearance: none;
+  border: 1px solid rgba(247, 250, 244, 0.4);
+  background: transparent;
+  color: var(--paper);
+  font-size: 1.25rem;
+  line-height: 1;
+  width: 2.75rem;
+  height: 2.75rem;
+  cursor: pointer;
+  transition: background var(--dur-ui), color var(--dur-ui);
+}
+
+.lightbox-close:hover,
+.lightbox-nav:hover {
+  background: var(--hivis);
+  color: var(--bark);
+  border-color: var(--hivis);
+}
+
+.lightbox-close {
+  top: 1rem;
+  right: 1rem;
+}
+
+.lightbox-nav--prev {
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.lightbox-nav--next {
+  right: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* ---------- 15. REVEALS ---------------------------------------------------- */
+.mask-lines {
+  opacity: 0;
+  translate: 0 24px;
+  transition: opacity var(--dur-reveal) var(--ease-reveal), translate var(--dur-reveal) var(--ease-reveal);
+}
+
+.mask-lines.is-visible {
+  opacity: 1;
+  translate: 0 0;
+}
+
+/* ---------- 16. REDUCED MOTION --------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .masonry-item,
+  .why-card,
+  .slab,
+  .mask-lines,
+  .cut-line,
+  .reveal-line > span {
+    opacity: 1 !important;
+    transform: none !important;
+    translate: 0 !important;
+    scale: 1 !important;
+    clip-path: inset(0) !important;
+  }
+}

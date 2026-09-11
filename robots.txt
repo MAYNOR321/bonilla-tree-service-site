@@ -1,0 +1,29 @@
+# Search engines: everything is crawlable.
+User-agent: *
+Allow: /
+
+# AI search crawlers, allowed on purpose. These are the bots behind ChatGPT
+# search, Claude, Perplexity and Gemini grounding — being crawlable by them is
+# what lets those assistants cite and recommend the business. The wildcard
+# above already permits them; they are listed so a future tightening of "*"
+# does not silently cut the business out of AI answers.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# /review/ is a redirect to Google's review form, not content. It carries a
+# noindex meta tag; it is deliberately NOT disallowed here, because a bot has
+# to be able to fetch the page to read that tag.
+
+Sitemap: https://bonillatreeservicellc.com/sitemap.xml
